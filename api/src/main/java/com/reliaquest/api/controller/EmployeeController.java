@@ -4,17 +4,18 @@ import com.reliaquest.api.dto.CreateEmployeeRequest;
 import com.reliaquest.api.dto.Employee;
 import com.reliaquest.api.service.EmployeeService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/employee")
 @RequiredArgsConstructor
+@Validated
 public class EmployeeController implements IEmployeeController<Employee, CreateEmployeeRequest>{
 
     private final EmployeeService employeeService;
@@ -25,18 +26,29 @@ public class EmployeeController implements IEmployeeController<Employee, CreateE
     }
 
     @Override
-    public ResponseEntity<List<Employee>> getEmployeesByNameSearch(String searchString) {
-        return null;
+    @GetMapping("/search/{searchString}")
+    public ResponseEntity<List<Employee>> getEmployeesByNameSearch(
+            @NotBlank(message = "Search string must not be blank")
+            @PathVariable
+            String searchString) {
+
+        return ResponseEntity.ok(employeeService.getEmployeesByNameSearch(searchString)
+        );
     }
 
+
     @Override
-    public ResponseEntity<Employee> getEmployeeById(String id) {
-        return null;
+    @GetMapping("/{id}")
+    public ResponseEntity<Employee> getEmployeeById(
+            @NotBlank(message = "Search id must not be blank")
+            @PathVariable
+            String id) {
+        return ResponseEntity.ok(employeeService.getByEmployeeId(id));
     }
 
     @Override
     public ResponseEntity<Integer> getHighestSalaryOfEmployees() {
-        return null;
+        return ResponseEntity.ok(employeeService.getHighestSalaryOfEmployees());
     }
 
     @Override
