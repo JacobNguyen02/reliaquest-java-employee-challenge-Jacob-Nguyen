@@ -115,7 +115,7 @@ class EmployeeServiceTest {
     @Test
     void getTopTenHighestEarningEmployeeNames_returnsTopTenInDescendingSalaryOrder() throws IOException {
         List<EmployeeDTO> employeeDTOs =
-                readJson("response/all-employees-data.json", new TypeReference<>() {}); // create a 15-record fixture
+                readJson("response/all-employees-data.json", new TypeReference<>() {});
 
         when(employeeClient.getAllEmployees()).thenReturn(employeeDTOs);
 
