@@ -14,8 +14,7 @@ public class WebClientConfiguration {
 
     @Bean("employeeWebClient")
     public WebClient employeeWebClient() {
-        return WebClient
-                .builder()
+        return WebClient.builder()
                 .baseUrl(employeeClientProperties.getBaseUri())
                 .build();
     }

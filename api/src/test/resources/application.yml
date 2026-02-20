@@ -1,2 +1,2 @@
-server.servlet.context-path: /employee-api
-employee-client.baseUrl: http://localhost:${wiremock.server.port}
+employee-client:
+  base-uri: http://localhost:${wiremock.server.port}

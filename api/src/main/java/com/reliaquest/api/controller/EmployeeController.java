@@ -4,18 +4,17 @@ import com.reliaquest.api.dto.CreateEmployeeRequest;
 import com.reliaquest.api.dto.Employee;
 import com.reliaquest.api.service.EmployeeService;
 import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
+import java.net.URI;
+import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import jakarta.validation.Validator;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.net.URI;
-import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api/employee")
@@ -32,18 +31,13 @@ public class EmployeeController implements IEmployeeController<Employee, CreateE
     }
 
     @Override
-    public ResponseEntity<List<Employee>> getEmployeesByNameSearch(
-            @PathVariable
-            String searchString) {
+    public ResponseEntity<List<Employee>> getEmployeesByNameSearch(@PathVariable String searchString) {
 
-        return ResponseEntity.ok(employeeService.getEmployeesByNameSearch(searchString)
-        );
+        return ResponseEntity.ok(employeeService.getEmployeesByNameSearch(searchString));
     }
 
     @Override
-    public ResponseEntity<Employee> getEmployeeById(
-            @PathVariable
-            String id) {
+    public ResponseEntity<Employee> getEmployeeById(@PathVariable String id) {
         return ResponseEntity.ok(employeeService.getByEmployeeId(id));
     }
 
@@ -58,10 +52,9 @@ public class EmployeeController implements IEmployeeController<Employee, CreateE
     }
 
     @Override
-    public ResponseEntity<Employee> createEmployee(
-           @RequestBody CreateEmployeeRequest createEmployeeRequestBody) {
+    public ResponseEntity<Employee> createEmployee(@RequestBody CreateEmployeeRequest createEmployeeRequestBody) {
 
-        //Manual validation since overridden methods cannot strengthen parameter constraints
+        // Manual validation since overridden methods cannot strengthen parameter constraints
         Set<ConstraintViolation<CreateEmployeeRequest>> violations = validator.validate(createEmployeeRequestBody);
         if (!CollectionUtils.isEmpty(violations)) {
             String message = violations.stream()
@@ -74,8 +67,7 @@ public class EmployeeController implements IEmployeeController<Employee, CreateE
 
         Employee createdEmployee = employeeService.createEmployee(createEmployeeRequestBody);
 
-        return ResponseEntity
-                .created(URI.create("/api/employee/" + createdEmployee.getId()))
+        return ResponseEntity.created(URI.create("/api/employee/" + createdEmployee.getId()))
                 .body(createdEmployee);
     }
 

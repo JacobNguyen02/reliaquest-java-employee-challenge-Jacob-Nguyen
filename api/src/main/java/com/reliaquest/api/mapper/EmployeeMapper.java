@@ -2,10 +2,9 @@ package com.reliaquest.api.mapper;
 
 import com.reliaquest.api.client.dto.EmployeeDTO;
 import com.reliaquest.api.dto.Employee;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.Objects;
+import org.springframework.stereotype.Component;
 
 @Component
 public class EmployeeMapper {
@@ -21,8 +20,7 @@ public class EmployeeMapper {
                 employeeDTO.getEmployeeSalary(),
                 employeeDTO.getEmployeeAge(),
                 employeeDTO.getEmployeeTitle(),
-                employeeDTO.getEmployeeEmail()
-        );
+                employeeDTO.getEmployeeEmail());
     }
 
     public List<Employee> toEmployees(List<EmployeeDTO> employeeDTOList) {
@@ -30,8 +28,6 @@ public class EmployeeMapper {
             return List.of();
         }
 
-        return employeeDTOList.stream()
-                .map(this::toEmployee)
-                .toList();
+        return employeeDTOList.stream().map(this::toEmployee).toList();
     }
 }
