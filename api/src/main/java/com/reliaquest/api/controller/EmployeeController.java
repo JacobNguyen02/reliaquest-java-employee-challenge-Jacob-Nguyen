@@ -3,22 +3,28 @@ package com.reliaquest.api.controller;
 import com.reliaquest.api.dto.CreateEmployeeRequest;
 import com.reliaquest.api.dto.Employee;
 import com.reliaquest.api.service.EmployeeService;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.ConstraintViolation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Validator;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.net.URI;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/employee")
 @RequiredArgsConstructor
 @Validated
-public class EmployeeController implements IEmployeeController<Employee, CreateEmployeeRequest>{
+public class EmployeeController implements IEmployeeController<Employee, CreateEmployeeRequest> {
 
     private final EmployeeService employeeService;
+    private final Validator validator;
 
     @Override
     public ResponseEntity<List<Employee>> getAllEmployees() {
@@ -26,9 +32,7 @@ public class EmployeeController implements IEmployeeController<Employee, CreateE
     }
 
     @Override
-    @GetMapping("/search/{searchString}")
     public ResponseEntity<List<Employee>> getEmployeesByNameSearch(
-            @NotBlank(message = "Search string must not be blank")
             @PathVariable
             String searchString) {
 
@@ -36,11 +40,8 @@ public class EmployeeController implements IEmployeeController<Employee, CreateE
         );
     }
 
-
     @Override
-    @GetMapping("/{id}")
     public ResponseEntity<Employee> getEmployeeById(
-            @NotBlank(message = "Search id must not be blank")
             @PathVariable
             String id) {
         return ResponseEntity.ok(employeeService.getByEmployeeId(id));
@@ -53,16 +54,33 @@ public class EmployeeController implements IEmployeeController<Employee, CreateE
 
     @Override
     public ResponseEntity<List<String>> getTopTenHighestEarningEmployeeNames() {
-        return null;
+        return ResponseEntity.ok(employeeService.getTopTenHighestEarningEmployeeNames());
     }
 
     @Override
-    public ResponseEntity<Employee> createEmployee( @Valid @RequestBody CreateEmployeeRequest employeeInput) {
-        return null;
+    public ResponseEntity<Employee> createEmployee(
+           @RequestBody CreateEmployeeRequest createEmployeeRequestBody) {
+
+        //Manual validation since overridden methods cannot strengthen parameter constraints
+        Set<ConstraintViolation<CreateEmployeeRequest>> violations = validator.validate(createEmployeeRequestBody);
+        if (!CollectionUtils.isEmpty(violations)) {
+            String message = violations.stream()
+                    .findFirst()
+                    .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
+                    .orElse("Validation failed");
+
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
+        }
+
+        Employee createdEmployee = employeeService.createEmployee(createEmployeeRequestBody);
+
+        return ResponseEntity
+                .created(URI.create("/api/employee/" + createdEmployee.getId()))
+                .body(createdEmployee);
     }
 
     @Override
-    public ResponseEntity<String> deleteEmployeeById(String id) {
-        return null;
+    public ResponseEntity<String> deleteEmployeeById(@PathVariable String id) {
+        return ResponseEntity.ok(employeeService.deleteEmployeeById(id));
     }
 }
